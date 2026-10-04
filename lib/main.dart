@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CST2335 Samples',
+      title: 'CST3104 Samples',
       theme: ThemeData(
         // This is the theme of your application.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -61,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> savePrefs(BuildContext context) async {
     SharedPreferences.getInstance().then( (prefs) {
-      prefs.setString('Course', 'CST2335');
+      prefs.setString('Course', 'CST3104');
       var snackBar = SnackBar(
         content: Text('Course saved'),
         duration: Duration(seconds: 3),
