@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'DataRepository.dart';
 import 'OtherPage.dart';
+import 'ThirdPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       routes:  {
         '/Main'   :   (context) => MyHomePage(title:"Week 5 - Routes"),
         '/Second' :   (context) { return OtherPage(); } ,
-        '/Third'  :   (context) { return OtherPage(); }
+        '/Third'  :   (context) { return ThirdPage(); }
       },
 
       title: 'Android Samples',
