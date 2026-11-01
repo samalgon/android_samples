@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -83,7 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             wordsArray[rowNum] = wordsArray[rowNum].toUpperCase();
                           });
                         },
-                        child: const Icon(Icons.arrow_upward),
+                        //child: const Icon(Icons.arrow_upward, color: Colors.blue, size: 20),
+                        child : Tooltip(message: "Tap Here to go upper case", child: const Icon(Icons.arrow_upward, color: Colors.blue, size: 30)),
                       ),
                       GestureDetector(
                         onDoubleTap: () {
@@ -91,7 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             wordsArray[rowNum] = wordsArray[rowNum].toLowerCase();
                           });
                         },
-                        child: const Icon(Icons.arrow_downward),
+                        //child: const Icon(Icons.arrow_downward),
+                        child : Tooltip(message: "Double Tap Here to go lower case", child: const Icon(Icons.arrow_downward, color: Colors.blue, size: 30)),
                       ),
                       GestureDetector(
                         onLongPress: () {
@@ -99,7 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             wordsArray.removeAt(rowNum);
                           });
                         },
-                        child: const Icon(Icons.delete),
+                        //child: const Icon(Icons.delete),
+                        child : Tooltip(message: "Long Press Here to delete", child: const Icon(Icons.delete, color: Colors.blue, size: 30)),
                       ),
                     ]
                 );
