@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'ToDoItem.dart';
-import 'ToDoDAO.dart';
+import 'todo_item.dart';
+import 'todo_dao.dart';
 import 'package:floor/floor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 

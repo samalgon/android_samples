@@ -1,5 +1,5 @@
 import 'package:floor/floor.dart';
-import 'ToDoItem.dart';
+import 'todo_item.dart';
 
 @dao
 abstract class ToDoDAO {
@@ -17,5 +17,7 @@ abstract class ToDoDAO {
 
   @delete
   Future<void> deleteItem(ToDoItem item);
-  
+
+  @Query('DELETE FROM ToDoItem')
+  Future<void> deleteAllItems();
 }

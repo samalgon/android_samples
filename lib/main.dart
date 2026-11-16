@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'ToDoDAO.dart';
-import 'ToDoItem.dart';
+import 'todo_dao.dart';
+import 'todo_item.dart';
 import 'database.dart';
 
 void main() {
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _inputController = TextEditingController();
 
     $FloorToDoDatabase
-        .databaseBuilder('todo_database.db')
+        .databaseBuilder('mytodo_database.db')
         .build()
         .then((database) async { //Note the use of async here
       taskDAO = database.toDoDAO;
@@ -72,21 +72,16 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(widget.title)),
-        body: listPage(),
-        floatingActionButton: FloatingActionButton(
-            onPressed: addTask,
-            tooltip: 'Add a Task',
-            child: const Icon(Icons.add)));
+        body: listPage());
   }
 
-  void addTask() {
+  Future<void> addTask() async {
     if (_inputController.text.isNotEmpty) {
+      // Use this if Primary Key is not auto-generated
+      var newItem = ToDoItem(todoItem: _inputController.text);
+      await taskDAO.insertItem(newItem);
       setState(() {
-        // Use this if Primary Key is not auto-generated
-        //ToDoItem(ToDoItem.ID++, _inputController.text);
-        var newItem = ToDoItem(null, _inputController.text);
         todoList.add(newItem);
-        taskDAO.insertItem(newItem);
         _inputController.clear();
       });
     } else {
@@ -95,17 +90,54 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void deleteAll() async {
+    if (todoList.isNotEmpty) {
+      await taskDAO.deleteAllItems();
+      setState(() {
+        todoList.clear();
+      });
+    }
+  }
   Widget listPage() {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          const SizedBox(width: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: todoList.length,
+              itemBuilder: (context, rowNum) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded (
+                      flex: 3,
+                      child: Container (
+                        color: rowNum.isEven ? Colors.blue[50]! : Colors.blue[50]!,
+                        child: Center(child: Text(todoList[rowNum].todoItem, style: const TextStyle(fontSize: 20.0, color:Colors.black),)),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                  ]);
+              }),
+
+          ),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(width: 20),
+              const SizedBox(width: 10),
+              Expanded (
+                flex: 1,
+                child: ElevatedButton(
+                  onPressed: deleteAll,
+                  child: const Text('Del All', textAlign: TextAlign.center, style: TextStyle(fontSize: 16.0, color:Colors.blue),),
+                ),
+              ),
+              const SizedBox(width: 10),
               Expanded(
+                flex: 3,
                 child: TextField(
                   controller: _inputController,
                   decoration: const InputDecoration(
@@ -118,23 +150,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(width: 20),
+              Expanded (
+                flex: 1,
+                child: ElevatedButton(
+                  onPressed: addTask,
+                  child: const Text('Add', textAlign: TextAlign.center, style: TextStyle(fontSize: 16.0, color:Colors.blue),),
+                ),
+              ),
             ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: todoList.length,
-              itemBuilder: (context, rowNum) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 20),
-                    //Text("${todoList[rowNum]} "),
-                    Text(
-                      "${todoList[rowNum].todoItem}",
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ]);
-              }),
           ),
         ],
       ),
