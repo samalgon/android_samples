@@ -21,47 +21,48 @@ class MyApp extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return  _MyAppState(); //subclass of State<StatefulWidget>
+    return _MyAppState(); //subclass of State<StatefulWidget>
   }
-
 } //close of MyApp
 
-class _MyAppState extends State<StatefulWidget>
-{
+class _MyAppState extends State<StatefulWidget> {
+  var _locale = const Locale(
+    "en",
+    "EN",
+  ); //Language when start the applicatoin    ca for canada, us for us, GB for england
 
-  var _locale = const Locale("en", "EN"); //Language when start the applicatoin    ca for canada, us for us, GB for england
-
-  void changeLanguage(Locale newLocale){
+  void changeLanguage(Locale newLocale) {
     setState(() {
-      _locale = newLocale;  //set the new language for your app, setState redraws the GUI
+      _locale =
+          newLocale; //set the new language for your app, setState redraws the GUI
     });
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     //declare what languages are supported:
     return MaterialApp(
-      supportedLocales:const [
-        Locale('en' , 'CA'),
-        Locale('de' , 'DE'),
+      supportedLocales: const [
+        Locale('en', 'CA'),
+        Locale('de', 'DE'),
         Locale('fr', "FR"),
-        Locale('ru', 'RU')
+        Locale('ru', 'RU'),
       ], //list all languages you support in your app
 
-      localizationsDelegates:  const[
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
+        GlobalWidgetsLocalizations.delegate,
       ],
-      locale:_locale, //start with "en" "ca"
+      locale: _locale, //start with "en" "ca"
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false, //remove the debug banner
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Localization Using ListView and Floor'),
     );
   }
 }
@@ -83,11 +84,10 @@ class _MyHomePageState extends State<MyHomePage> {
   late ToDoDAO myDAO; //initialized in initState()
 
   /// This holds what item was selected
-  ToDoItem? selectedItem  = null;
+  ToDoItem? selectedItem = null;
 
   //add items from the database first:
   List<ToDoItem> items = [];
-
 
   /// This is where variables are initialized
   @override
@@ -96,28 +96,42 @@ class _MyHomePageState extends State<MyHomePage> {
     _controller = TextEditingController(); //our late constructor
     //var database = await
     //open the database:
-    $FloorToDoDatabase.databaseBuilder('todo_database.db').build()
-        .then((database) async {
-
+    $FloorToDoDatabase.databaseBuilder('todo_database.db').build().then((
+      database,
+    ) async {
       myDAO = database.toDoDAO;
       //get Items from database:
       var it = await myDAO.getAllItems();
 
-      setState(()  {
+      setState(() {
         items = it;
       });
-
-    } ) ;
+    });
   }
 
   /// This is where variables are returned to memory
   @override
-  void dispose()
-  {
+  void dispose() {
     super.dispose();
-    _controller.dispose();    // clean up memory
+    _controller.dispose(); // clean up memory
   }
 
+  void addItem() async {
+    //get the text from the text field:
+    String newItem = _controller.text;
+    if (newItem.isEmpty) return; //don't add empty items
+
+    //create a new ToDoItem object:
+    ToDoItem item = ToDoItem(ToDoItem.ID++, newItem);
+
+    //insert into database:
+    await myDAO.insertItem(item);
+
+    setState(() {
+      items.add(item);
+      _controller.clear(); //clear the text field
+    });
+  }
   @override
   Widget build(BuildContext context) {
     // The Flutter framework has been optimized to make rerunning build methods
@@ -126,9 +140,24 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          OutlinedButton(child:Text("English") , onPressed: (){  MyApp.setLocale(context, Locale('en',"EN") );} ),
-          OutlinedButton(child:Text("German")  , onPressed: (){  MyApp.setLocale(context, Locale('de',"DE") );} ),
-          OutlinedButton(child:Text("French")  , onPressed: (){  MyApp.setLocale(context, Locale('fr',"FR") );} ),
+          OutlinedButton(
+            child: Text("English"),
+            onPressed: () {
+              MyApp.setLocale(context, Locale('en', "EN"));
+            },
+          ),
+          OutlinedButton(
+            child: Text("German"),
+            onPressed: () {
+              MyApp.setLocale(context, Locale('de', "DE"));
+            },
+          ),
+          OutlinedButton(
+            child: Text("French"),
+            onPressed: () {
+              MyApp.setLocale(context, Locale('fr', "FR"));
+            },
+          ),
         ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
@@ -140,24 +169,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget reactiveLayout() {
-    var size = MediaQuery
-        .of(context)
-        .size;
+    var size = MediaQuery.of(context).size;
     var height = size.height;
     var width = size.width;
 
     if ((width > height) && (width > 720)) //landscape
-        {
-      return Row(children: [
-        Expanded(flex: 1, child: ToDoList()),
-        Expanded(flex: 2, child: DetailsPage())
-      ]);
-    }
-    else //portrait mode
-        {
+    {
+      return Row(
+        children: [
+          Expanded(flex: 1, child: ToDoList()),
+          Expanded(flex: 2, child: DetailsPage()),
+        ],
+      );
+    } else //portrait mode
+    {
       if (selectedItem == null)
         return ToDoList();
-      else { //something is selected
+      else {
+        //something is selected
         return DetailsPage();
       }
     }
@@ -166,75 +195,80 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget DetailsPage() {
     TextStyle st = TextStyle(fontSize: 40.0);
 
-    return Column(children:[
-
-      if(selectedItem == null)
-        Text(   AppLocalizations.of(context)!.translate( "SelectSomething")!, style:st)
-      else
-        Text("You selected:" + selectedItem!.todoItem, style:st) //! means non-null assertion
-      ,
-      ElevatedButton(child:Text("Ok"), onPressed: () {
-        //update GUI:
-        setState(() {
-          selectedItem = null; //clear the selection
-        });
-
-
-      })
-
-    ]);
-
+    return Column(
+      children: [
+        if (selectedItem == null)
+          Text(
+            AppLocalizations.of(context)!.translate("SelectSomething")!,
+            style: st,
+          )
+        else
+          Text(
+            "You selected:" + selectedItem!.todoItem,
+            style: st,
+          ), //! means non-null assertion
+        ElevatedButton(
+          child: Text("Ok"),
+          onPressed: () {
+            //update GUI:
+            setState(() {
+              selectedItem = null; //clear the selection
+            });
+          },
+        ),
+      ],
+    );
   }
 
-  Widget ToDoList(){
+  Widget ToDoList() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Row(children: [
-            Flexible(child:
-            TextField(controller: _controller,
-              decoration: InputDecoration(
-                hintText:AppLocalizations.of(context)!.translate("TypeHere")!,
-                labelText: AppLocalizations.of(context)!.translate("PutYourNameHere")!,
-                border: OutlineInputBorder(),
+          Row(
+            children: [
+              Flexible(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText:
+                        AppLocalizations.of(context)!.translate("TypeHere")!,
+                    labelText:
+                        AppLocalizations.of(
+                          context,
+                        )!.translate("PutYourNameHere")!,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-            )),
 
-            ElevatedButton(onPressed: () {
-              //what was typed is:
-              var input = _controller.value.text;
-              //generate UNIQUE ids
-              var todoItem = ToDoItem(ToDoItem.ID++, input);
-              myDAO.insertItem(todoItem);
-
-              setState(() { //redraw the GUI
-
-                items.add(todoItem); //add the item to the LIST
-
-                _controller.text = ""; //reset the textField
-              });
-            }, //Lambda, or anonymous function
-              child: Text( AppLocalizations.of(context)!.translate('Add')! ),)
-          ],),
-          Flexible(child:
-          ListView.builder(
+              ElevatedButton(
+               onPressed : addItem,
+                child: Text(AppLocalizations.of(context)!.translate('Add')!),
+              ),
+            ],
+          ),
+          Flexible(
+            child: ListView.builder(
               itemCount: items.length,
               itemBuilder: (ctx, rowNum) {
-                return
-                  GestureDetector(
-                      onTap:() {
-                        setState(() {//redraw the GUI:
-                          selectedItem = items[rowNum];
-                        });
-
-                      },
-                      child:
-                      Text("Item $rowNum = ${items[rowNum].todoItem }",
-                        style: TextStyle(fontSize: 30.0),));
-              }))
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      //redraw the GUI:
+                      selectedItem = items[rowNum];
+                    });
+                  },
+                  child: Text(
+                    "Item $rowNum = ${items[rowNum].todoItem}",
+                    style: TextStyle(fontSize: 30.0),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
-  }//end of reactiveLayout()
+  } //end of reactiveLayout()
 }
